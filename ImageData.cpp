@@ -352,7 +352,7 @@ vector<KeyPoint> ImageData::harrisKeypoints(int blockSize, double sigma, double 
         {
             if ((int)dst_norm.at<float>(i, j) > thresh)
             {
-                keys.push_back(KeyPoint(i, j, size));
+                keys.push_back(KeyPoint(Point(j, i), size));
             }
         }
     return keys;

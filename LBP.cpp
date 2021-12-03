@@ -41,7 +41,7 @@ Mat LBP::getFeat(const Mat& src, vector<KeyPoint>& kp, int gridx, int gridy)
 {
     Mat dst;
     LBP::create(src, dst);
-    cout << dst.rows << " " << dst.cols << endl;
+    // cout << dst.rows << " " << dst.cols << endl;
     Mat res(kp.size(), 256, CV_32FC1);
     int hc = (int)(gridx / 2);
     int hr = (int)(gridy / 2);
@@ -82,7 +82,7 @@ Mat LBP::getFeat(const Mat& src, vector<KeyPoint>& kp, int gridx, int gridy)
             res.at<float>(nf, i) = (float)hist_.at<int>(0, i);
         nf++;
     }
-    cout << res.rows <<  " " << res.cols << endl;
+    // cout << res.rows <<  " " << res.cols << endl;
     return res;
 }
 
