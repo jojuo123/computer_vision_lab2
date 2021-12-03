@@ -39,7 +39,7 @@ bool handleImage(char** argv, Mat image, bool isCam)
     int ker_size = max((ker_size_tb % 2 == 0) ? ker_size_tb + 1 : ker_size_tb, 3);
     double sigma = (sigma_tb == 0) ? 1.0 : (double)sigma_tb;
     int threshhold = max(100, threshhold_tb);
-    int aperture_size = max(1, aperture_size_tb);
+    int aperture_size = max(3, (aperture_size_tb % 2 == 0) ? aperture_size_tb + 1 : aperture_size_tb);
     double harris_k = 0.04 + (((double)harris_k_param) * 0.02) / (MAX_K);
     double thresh = ((double)threshhold_tb) / (MAX_THRESH_BLOB);
     int gridx = max(1, gridx_tb);
