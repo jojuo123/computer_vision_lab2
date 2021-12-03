@@ -41,28 +41,48 @@ Mat LBP::getFeat(const Mat& src, vector<KeyPoint>& kp, int gridx, int gridy)
 {
     Mat dst;
     LBP::create(src, dst);
-    Mat res(kp.size(), 256, CV_32SC1);
-    int hx = (int)(gridx / 2);
-    int hy = (int)(gridy / 2);
+    cout << dst.rows << " " << dst.cols << endl;
+    Mat res(kp.size(), 256, CV_32FC1);
+    int hc = (int)(gridx / 2);
+    int hr = (int)(gridy / 2);
     int nf = 0;
     for (KeyPoint k : kp)
     {
-        int px = (int)k.pt.y;
-        int py = (int)k.pt.x;
-        int sx = max(0, px-hx);
-        int sy = max(0, py-hy);
-        int fx = min(src.cols, sx+gridx);
-        int fy = min(src.rows, sy+gridy);
+        int pr = (int)k.pt.y;
+        int pc = (int)k.pt.x;
+        int sr = max(0, pr-hr);
+        int sc = max(0, pc-hc);
+        int fr, fc;
+        if (sr + gridy > src.rows-1)
+        {
+            fr = src.rows-1;
+            sr = max(0, fr-gridy);
+        }
+        else 
+        {
+            fr = sr+gridy;
+        }
+        if (sc + gridx > src.cols-1)
+        {
+            fc = src.cols-1;
+            sc = max(0, fc-gridx);
+        }
+        else
+        {
+            fc = sc+gridx;
+        }
         // cout << px << " " << py << endl;
-        // cout << sx << " " << fx << " " << sy <<  " " << fy << endl;
-        Mat cell = Mat(dst, Rect(sx, sy, fx-sx, fy-sy));
+        // cout << sr << " " << sc << endl << fr <<  " " << fc << endl << endl;
+
+        Mat cell = Mat(dst, Rect(sc, sr, fc-sc, fr-sr));
         Mat hist = histogram(cell, 256);
         Mat hist_;
         normalize(hist, hist_, 0, 255, NORM_MINMAX, CV_32SC1);
         for (int i = 0; i < 256; i++)
-            res.at<int>(nf, i) = hist_.at<int>(0, i);
+            res.at<float>(nf, i) = (float)hist_.at<int>(0, i);
         nf++;
     }
+    cout << res.rows <<  " " << res.cols << endl;
     return res;
 }
 

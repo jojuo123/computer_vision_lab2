@@ -136,7 +136,7 @@ ImageData::ImageData(string fname)
     cvtColor(image, image_gray, COLOR_BGR2GRAY);
 }
 
-Mat ImageData::harrisDectect(int blockSize, double sigma, double k, double thresh, int apertureSize)
+Mat ImageData::harrisDectect(int blockSize, double sigma, double k, int thresh, int apertureSize)
 {
 
     Mat dst, dst_norm, dst_norm_scaled;
@@ -149,9 +149,9 @@ Mat ImageData::harrisDectect(int blockSize, double sigma, double k, double thres
     for (int i = 0; i < dst_norm.rows; i++)
         for (int j = 0; j < dst_norm.cols; j++)
         {
-            if ((int)dst_norm.at<float>(i, j) > (int)thresh)
+            if ((int)dst_norm.at<float>(i, j) > thresh)
             {
-                circle(res, Point(j, i), 5, Scalar(0), 2, 8, 0);
+                circle(res, Point(j, i), 5, Scalar(0, 0, 255), 2, 8, 0);
             }
         }
     return res;
@@ -227,7 +227,7 @@ Mat ImageData::blobDetect(int ker_size, double threshhold)
     vector<double> scales;
 
     int iter = 1;
-    while (iter <= 30)
+    while (iter <= 20)
     {
         double sigma = (double)iter;
         // Mat_<double> kernel = Kernel::gauss_mat(ker_size, sigma);
@@ -251,6 +251,7 @@ Mat ImageData::blobDetect(int ker_size, double threshhold)
     int width = image.cols;
     int height = image.rows;
 
+    vector<KeyPoint> keys;
     for (int x = 1; x < width-1; x++)
     {
         for (int y = 1; y < height-1; y++)
@@ -272,7 +273,6 @@ Mat ImageData::blobDetect(int ker_size, double threshhold)
                         int u = x + dx[k], v = y + dy[k], t = i + z;
                         if (t >= scaleSpace.size() || t < 0)
                             continue;
-                        // cout << u << " " << v << " " << t << endl;
                         if (pivot <= scaleSpace[t](v, u))
                         {
                             maxFound = false;
@@ -295,11 +295,36 @@ Mat ImageData::blobDetect(int ker_size, double threshhold)
                 int rad = (int)(maxScale * sqrt(2));
                 if (rad == 0) rad = 1;
                 // f << x << " " << y << " " << rad << " " << maxResponse << endl;
+                // keys.push_back(KeyPoint(x, y, rad*2, -1, maxResponse));
                 circle(res, Point(x, y), rad, Scalar(0, 0, 255), 1);
             }
         }
     }
     // f.close();
+    // vector<KeyPoint> final_keys;
+    // for (int i = 0; i < keys.size(); i++)
+    // {
+    //     bool isKey = true;
+    //     for (int j = 0; j < keys.size(); j++)
+    //     {
+    //         if (i == j) continue;
+    //         int x1 = (int)keys[i].pt.x;
+    //         int x2 = (int)keys[j].pt.x;
+    //         int y1 = (int)keys[i].pt.y;
+    //         int y2 = (int)keys[j].pt.y;
+    //         int r1 = (int)keys[i].size/2;
+    //         int r2 = (int)keys[j].size/2;
+    //         if (circleIntersect(x1, y1, x2, y2, r1, r2) > 0)
+    //         {
+    //             if (keys[i].response < keys[j].response)
+    //                 isKey = false;
+    //         }
+    //     }
+    //     if (isKey)
+    //     {
+    //         circle(res, keys[i].pt, keys[i].size, Scalar(0, 0, 255), 1);
+    //     }
+    // }
     return res;
 }
 
@@ -365,6 +390,7 @@ Mat ImageData::SiftBlob(vector<KeyPoint>& kp, int ker_size, double threshhold)
     Mat descriptors;
     Ptr<SIFT> siftPtr = SIFT::create();
     siftPtr->compute(image_gray, keys, descriptors);
+    // cout << descriptors.rows << " " << descriptors.cols;
     return descriptors;
 }
 
@@ -495,6 +521,7 @@ Mat ImageData::lbp(vector<KeyPoint>& kp, int blockSize, double sigma, int thresh
 {
     vector<KeyPoint> keys = harrisKeypoints(blockSize, sigma, k, thresh, apertureSize);
     kp = keys;
+    cout << keys.size() << endl;
     Mat des = LBP::getFeat(image_gray, keys, gridx, gridy);
     return des;
 }
